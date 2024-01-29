@@ -16,7 +16,12 @@ def get_bot_response(user_input, top_k, top_p, temperature, max_tokens):
     response = requests.post(endpoint, json=data)
     response_data = response.json()
     
-    return response_data[0]["generated_text"]
+    # Check if the response is a list and access the first element, otherwise directly access the dictionary
+    if isinstance(response_data, list):
+        return response_data[0]["generated_text"]
+    else:
+        # If it's a dictionary, check for the 'generated_text' key
+        return response_data.get("generated_text", "No response generated")
 
 # Initialize session state for storing conversation
 if 'conversation' not in st.session_state:
@@ -32,16 +37,13 @@ max_tokens = st.sidebar.number_input("Max Tokens", min_value=0, max_value=512, v
 # Main chat interface
 st.title("Marcaps Chatbot")
 
-# Function to display messages
-def display_message(index, speaker, message):
+# Display conversation history and input for new message
+for index, (speaker, message) in enumerate(reversed(st.session_state['conversation'])):
+    # Display past messages
     if speaker == 'user':
         st.text_area(f"You: ", value=message, height=50, key=f"msg_{index}_user", disabled=True)
     else:
         st.text_area(f"Msrcaps: ", value=message, height=100, key=f"msg_{index}_bot", disabled=True)
-
-# Display conversation history
-for index, (speaker, message) in enumerate(reversed(st.session_state['conversation'])):
-    display_message(index, speaker, message)
 
 # User input for new message
 user_input = st.text_input("You: ", value='', key="new_user_input")
