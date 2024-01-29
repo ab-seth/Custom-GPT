@@ -23,9 +23,11 @@ def get_bot_response(user_input, top_k, top_p, temperature, max_tokens):
         # If it's a dictionary, check for the 'generated_text' key
         return response_data.get("generated_text", "No response generated")
 
-# Initialize session state for storing conversation
+# Initialize session state for storing conversation and input counter
 if 'conversation' not in st.session_state:
     st.session_state['conversation'] = []
+if 'input_counter' not in st.session_state:
+    st.session_state['input_counter'] = 0
 
 # Sidebar for settings
 st.sidebar.header("Settings")
@@ -37,24 +39,26 @@ max_tokens = st.sidebar.number_input("Max Tokens", min_value=0, max_value=512, v
 # Main chat interface
 st.title("Marcaps Chatbot")
 
-# Display conversation history and input for new message
-for index, (speaker, message) in enumerate(reversed(st.session_state['conversation'])):
+# Display conversation history
+for index, (speaker, message) in enumerate(st.session_state['conversation']):
     # Display past messages
     if speaker == 'user':
         st.text_area(f"You: ", value=message, height=50, key=f"msg_{index}_user", disabled=True)
     else:
         st.text_area(f"Msrcaps: ", value=message, height=100, key=f"msg_{index}_bot", disabled=True)
 
+# Generate a unique key for the text input widget based on the input counter
+input_key = f"user_input_{st.session_state['input_counter']}"
+
 # User input for new message
-user_input = st.text_input("You: ", value='', key="new_user_input")
+user_input = st.text_input("You: ", value='', key=input_key)
 
 # Send button
 send_button = st.button("Send")
 
-# When the user submits a new message
 if send_button and user_input:
     st.session_state['conversation'].append(('user', user_input))
     bot_response = get_bot_response(user_input, top_k, top_p, temperature, max_tokens)
     st.session_state['conversation'].append(('bot', bot_response))
-    # Clear the input box by rerunning the app
+    st.session_state['input_counter'] += 1
     st.experimental_rerun()
