@@ -1,5 +1,11 @@
 import streamlit as st
 import requests
+import os
+from dotenv import load_dotenv
+
+
+
+load_dotenv() # make a call before trying to access the environment variable
 
 # Function to send requests to the Hugging Face endpoint
 def get_bot_response(user_input, top_k, top_p, temperature, max_tokens):
@@ -12,7 +18,7 @@ def get_bot_response(user_input, top_k, top_p, temperature, max_tokens):
             "max_new_tokens": max_tokens
         }
     }
-    endpoint = "https://losqfanm1rbvckyl.eu-west-1.aws.endpoints.huggingface.cloud"
+    endpoint = os.getenv('ENDPOINT_URL')
     response = requests.post(endpoint, json=data)
     response_data = response.json()
     
