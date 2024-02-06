@@ -1,11 +1,11 @@
 import streamlit as st
 import requests
 import os
-from dotenv import load_dotenv
+# from dotenv import load_dotenv
 
 
 
-load_dotenv() # make a call before trying to access the environment variable
+# load_dotenv() # make a call before trying to access the environment variable
 
 # Function to send requests to the Hugging Face endpoint
 def get_bot_response(user_input, top_k, top_p, temperature, max_tokens):
